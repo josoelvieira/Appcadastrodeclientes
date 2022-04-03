@@ -1,4 +1,4 @@
-import { dataBase } from '../config'
+import { getDatabase } from 'firebase/database'
 import firestore, {
   addDoc,
   collection,
@@ -12,6 +12,7 @@ import Cliente from '../../core/Cliente'
 import ClienteRepositorio from '../../core/ClienteRepositorio'
  
 export default class ColecaoCliente implements ClienteRepositorio {
+  
  
   #conversor = {
     toFirestore: (cliente: Cliente) => {
@@ -29,12 +30,12 @@ export default class ColecaoCliente implements ClienteRepositorio {
       },
     }
     
-  #colecaoCliente = collection(dataBase, 'clientes').withConverter(this.#conversor)
+  #colecaoCliente = collection(getDatabase, 'clientes').withConverter(this.#conversor)
  
   async salvar(cliente: Cliente): Promise<Cliente> {
     if (cliente?.id) {
       await setDoc(
-        doc(dataBase, 'clientes', cliente.id).withConverter(this.#conversor),
+        doc(getDatabase, 'clientes', cliente.id).withConverter(this.#conversor),
         cliente,
       )
       return cliente
@@ -49,7 +50,7 @@ export default class ColecaoCliente implements ClienteRepositorio {
   }
  
   async excluir(cliente: Cliente): Promise<void> {
-    return await deleteDoc(doc(dataBase, 'clientes', cliente.id))
+    return await deleteDoc(doc(getDatabase, 'clientes', cliente.id))
   }
  
   async obterTodos(): Promise<Cliente[]> {
